@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portal - Solicitação de Cadastro no CS</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/6711/6711626.png" type="image/png">
+
+
+  <!-- ================================ ISSO AQUI É CSS - MEXE NO CONFIGURAÇÃO DO VISUAL DA PAGINA ====================================== -->
+  <style>
+    :root{
+      --bg1:#f2f6fb;
+      --bg2:#e6edf7;
+      --card:#ffffff;
+      --text:#1f2a44;
+      --muted:#5b6b84;
+      --primary:#0078D7;
+      --danger:#d83b01;
+      --ok:#00A746;
+      --border:#cfd7e3;
+      --shadow:0 10px 28px rgba(0,0,0,0.08);
+    }
+    body{
+      margin:0;
+      font-family:"Segoe UI", Arial, sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--text);
+    }
+    .page{ width:min(920px,92vw); margin:36px auto; }
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:28px;
+      box-shadow:var(--shadow);
+    }
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .titleBox{ display:flex; align-items:center; gap:10px; }
+    .titleBox img{ width:34px; height:34px; }
+    h1{ font-size:22px; margin:0; color:#003b5c; }
+    h3{ font-size:22px; margin:0; color:#003b5c; }
+    p.sub{ margin:8px 0 0 0; color:var(--muted); }
+    label{
+      margin-top:14px;
+      display:block;
+      font-weight:600;
+      color:var(--text);
+    }
+    input, select, textarea{
+      width:100%;
+      margin-top:6px;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      box-sizing:border-box;
+      font-family:inherit;
+      font-size:14px;
+    }
+    textarea{ resize:vertical; min-height:110px; }
+    input:focus, select:focus, textarea:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 2px rgba(0,120,215,0.15);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px 18px;
+      margin-top:12px;
+    }
+    @media (max-width:760px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+    button{
+      border:0;
+      border-radius:10px;
+      padding:10px 14px;
+      font-weight:700;
+      cursor:pointer;
+      font-family:inherit;
+    }
+    .btnPrimary{ background:var(--primary); color:#fff; }
+    .btnPrimary:disabled{ opacity:.6; cursor:not-allowed; }
+    .btnOutline{
+      background:#fff;
+      color:var(--primary);
+      border:2px solid var(--primary);
+    }
+    .btnDanger{
+      background:#fff;
+      color:var(--danger);
+      border:2px solid var(--danger);
+    }
+    .note{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#f6f9ff;
+      border:1px solid #e3ecff;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+    .status{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      display:none;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .status.ok{ display:block; border-color:#bfe7cd; background:#f2fbf5; color:#0f5132; }
+    .status.err{ display:block; border-color:#f5c2c7; background:#fff5f5; color:#842029; }
+    .loader{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:16px;
+    }
+    .loader.show{ display:flex; }
+    .loaderCard{
+      background:#fff;
+      border-radius:14px;
+      padding:18px 18px 16px 18px;
+      width:min(520px,92vw);
+      box-shadow:var(--shadow);
+      text-align:center;
+    }
+    .spinner{
+      width:42px; height:42px;
+      border:4px solid #d7e7fb;
+      border-top-color:var(--primary);
+      border-radius:50%;
+      margin:0 auto 12px auto;
+      animation:spin 0.9s linear infinite;
+    }
+    @keyframes spin{ to { transform:rotate(360deg); } }
+    .fileList{
+      margin:10px 0 0 0;
+      padding:0;
+      list-style:none;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .fileList li{
+      padding:6px 0;
+      border-bottom:1px dashed #e6edf7;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .pill{
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      flex:none;
+    }
+    .row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .row input[type="checkbox"]{ width:auto; margin:0; }
+    .mutedLink{
+      color:var(--muted);
+      text-decoration:underline;
+      cursor:pointer;
+      font-weight:600;
+      background:transparent;
+      border:0;
+      padding:0;
+    }
+  </style>
+</head>
+
+
+
+<!-- ================================== ISSO AQUI É HTML - É O VISUAL DA PAGINA ==================================================-->
+
+
+<body>
+  <div id="loader" class="loader" aria-hidden="true">
+    <div class="loaderCard" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <div id="loaderMsg" style="color:var(--muted);font-weight:600;">Enviando solicitação…</div>
+      <div class="hint">Não feche a página enquanto estiver enviando.</div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <div class="header">
+        <div class="titleBox">
+          <img src="https://cdn-icons-png.flaticon.com/512/3631/3631626.png" alt="Ícone">
+          <div>
+            <h1>Solicitação de cadastro no CS</h1>
+            <p class="sub">Envie sua solicitação com anexos. O fluxo do Power Automate abrirá uma aprovação.</p>
+          </div>
+        </div>
+        <button id="btnConfig" class="btnOutline" type="button" title="Configurar URL do Flow">Configurar</button>
+      </div>
+
+      <div class="note">
+        <div><strong>Importante:</strong> o nome dos campos enviados precisa bater com os campos do gatilho manual do Flow.</div>
+        <div class="hint">Se o Flow foi criado com outras chaves, ajuste o objeto `payload` no final deste arquivo.</div>
+      </div>
+
+      <form id="formCadastro">
+        <div class="grid">
+          <div>
+            <label for="nome">Nome completo *</label>
+            <input id="nome" autocomplete="name" />
+          </div>
+          <div>
+            <label for="email">E-mail corporativo *</label>
+            <input id="email" type="email" autocomplete="email" placeholder="nome.sobrenome@cpfl.com.br" />
+          </div>
+          <div>
+            <label for="matricula">Matrícula *</label>
+            <input id="matricula" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="area">Área / Departamento *</label>
+            <input id="area" />
+          </div>
+          <div>
+            <label for="gestorNome">Gestor (nome) *</label>
+            <input id="gestorNome" autocomplete="off" />
+          </div>
+          <div>
+            <label for="gestorEmail">Gestor (e-mail) *</label>
+            <input id="gestorEmail" type="email" autocomplete="off" />
+          </div>
+          <div>
+            <label for="tipoSolicitacao">Tipo de solicitação *</label>
+            <select id="tipoSolicitacao">
+              <option value="">Selecione…</option>
+              <option value="Novo cadastro">Novo cadastro</option>
+              <option value="Ajuste de perfil">Ajuste de perfil</option>
+              <option value="Desbloqueio / Reset">Desbloqueio / Reset</option>
+              <option value="Revogação de acesso">Revogação de acesso</option>
+            </select>
+          </div>
+          <div>
+            <label for="perfil">Perfil solicitado *</label>
+            <select id="perfil">
+              <option value="">Selecione…</option>
+              <option value="Leitura">Leitura</option>
+              <option value="Operação">Operação</option>
+              <option value="Analista">Analista</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="justificativa">Justificativa / Observações *</label>
+        <textarea id="justificativa" placeholder="Descreva o motivo, urgência, unidade, etc."></textarea>
+
+        <label for="anexos">Anexos (opcional)</label>
+        <input id="anexos" type="file" multiple />
+        <div class="hint">Dica: anexos grandes aumentam o tempo de envio. Limite padrão: 8 MB por arquivo (ajustável no código).</div>
+        <ul id="fileList" class="fileList"></ul>
+
+        <div class="row">
+          <input id="confirmacao" type="checkbox" />
+          <label for="confirmacao" style="margin:0;font-weight:600;">Confirmo que as informações acima estão corretas *</label>
+        </div>
+
+        <div class="actions">
+          <button id="btnEnviar" class="btnPrimary" type="submit">Enviar solicitação</button>
+          <button id="btnLimpar" class="btnDanger" type="button">Limpar</button>
+          <button id="btnCopiar" class="btnOutline" type="button">Copiar payload</button>
+        </div>
+      </form>
+
+      <div id="statusOk" class="status"></div>
+      <div id="statusErr" class="status"></div>
+
+      <div class="note" style="margin-top:18px;">
+        <div><strong>Configuração do Flow:</strong></div>
+        <div>1) No gatilho manual, crie campos (texto) com os nomes usados no `payload` e, se quiser anexos, trate `anexos` como array (Parse JSON).</div>
+        <div>2) Se o Flow retornar um número de protocolo/ID, ele aparecerá no retorno e será exibido aqui.</div>
+        <div class="hint">Abra “Configurar” para trocar a URL do Flow sem editar o arquivo. Opcional: use um proxy (ex.: `http://localhost:3000/api/cadastro-cs`) para não expor o `sig` no HTML.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // CONFIGURAÇÃO
+    // =========================
+    // URL do seu Flow (gatilho manual). Evite expor isso publicamente (o "sig" permite rodar o Flow).
+    const DEFAULT_FLOW_URL = "https://default93546618e20a4fd3a8849e33ca7234.a7.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0bc7c03648274ad796550036b0d194ab/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=wWulMqYeFSIGXTVJNYn_A1DDWM5oocUug87NYUZ5JZA";
+    const LS_FLOW_URL_KEY = "portal_cs_flow_url";
+    const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
+    const MAX_FILES = 8;
+
+    function getFlowUrl() {
+      const fromLs = (localStorage.getItem(LS_FLOW_URL_KEY) || "").trim();
+      return fromLs || DEFAULT_FLOW_URL;
+    }
+
+    function setFlowUrl(url) {
+      const trimmed = String(url || "").trim();
+      if (!trimmed) {
+        localStorage.removeItem(LS_FLOW_URL_KEY);
+        return;
+      }
+      localStorage.setItem(LS_FLOW_URL_KEY, trimmed);
+    }
+
+    // =========================
+    // UI helpers
+    // =========================
+    const loader = document.getElementById("loader");
+    const loaderMsg = document.getElementById("loaderMsg");
+    const statusOk = document.getElementById("statusOk");
+    const statusErr = document.getElementById("statusErr");
+    const btnEnviar = document.getElementById("btnEnviar");
+
+    function showLoader(msg) {
+      loaderMsg.textContent = msg || "Processando…";
+      loader.classList.add("show");
+      btnEnviar.disabled = true;
+    }
+    function hideLoader() {
+      loader.classList.remove("show");
+      btnEnviar.disabled = false;
+    }
+    function showOk(text) {
+      statusErr.textContent = "";
+      statusErr.classList.remove("err");
+      statusErr.classList.remove("ok");
+      statusOk.classList.remove("err");
+      statusOk.textContent = text;
+      statusOk.classList.add("ok");
+    }
+    function showErr(text) {
+      statusOk.textContent = "";
+      statusOk.classList.remove("ok");
+      statusOk.classList.remove("err");
+      statusErr.classList.remove("ok");
+      statusErr.textContent = text;
+      statusErr.classList.add("err");
+    }
+    function clearStatus() {
+      statusOk.textContent = "";
+      statusOk.classList.remove("ok");
+      statusOk.classList.remove("err");
+      statusErr.textContent = "";
+      statusErr.classList.remove("err");
+      statusErr.classList.remove("ok");
+    }
+
+    // =========================
+    // Arquivos
+    // =========================
+    const anexosInput = document.getElementById("anexos");
+    const fileList = document.getElementById("fileList");
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes)) return "";
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let i = 0;
+      while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+      return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+    }
+
+    function renderFileList(files) {
+      fileList.innerHTML = "";
+      if (!files || files.length === 0) return;
+      Array.from(files).forEach(f => {
+        const li = document.createElement("li");
+        const left = document.createElement("div");
+        left.textContent = f.name;
+        const right = document.createElement("span");
+        right.className = "pill";
+        right.textContent = `${formatBytes(f.size)}${f.type ? " • " + f.type : ""}`;
+        li.appendChild(left);
+        li.appendChild(right);
+        fileList.appendChild(li);
+      });
+    }
+
+    anexosInput.addEventListener("change", () => {
+      clearStatus();
+      const files = anexosInput.files || [];
+      renderFileList(files);
+    });
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Falha ao ler arquivo."));
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const idx = result.indexOf("base64,");
+          resolve(idx >= 0 ? result.slice(idx + 7) : "");
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // =========================
+    // Validações
+    // =========================
+    function isEmailOk(email) {
+      const v = String(email || "").trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    function getFormData() {
+      return {
+        nome: document.getElementById("nome").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        matricula: document.getElementById("matricula").value.trim(),
+        area: document.getElementById("area").value.trim(),
+        gestorNome: document.getElementById("gestorNome").value.trim(),
+        gestorEmail: document.getElementById("gestorEmail").value.trim(),
+        tipoSolicitacao: document.getElementById("tipoSolicitacao").value,
+        perfil: document.getElementById("perfil").value,
+        justificativa: document.getElementById("justificativa").value.trim(),
+        confirmacao: document.getElementById("confirmacao").checked,
+        anexos: anexosInput.files ? Array.from(anexosInput.files) : []
+      };
+    }
+
+    function validate(form) {
+      if (!form.nome) return "Informe o nome completo.";
+      if (!form.email || !isEmailOk(form.email)) return "Informe um e-mail válido.";
+      if (!form.matricula) return "Informe a matrícula.";
+      if (!form.area) return "Informe a área/departamento.";
+      if (!form.gestorNome) return "Informe o nome do gestor.";
+      if (!form.gestorEmail || !isEmailOk(form.gestorEmail)) return "Informe o e-mail do gestor.";
+      if (!form.tipoSolicitacao) return "Selecione o tipo de solicitação.";
+      if (!form.perfil) return "Selecione o perfil solicitado.";
+      if (!form.justificativa) return "Informe a justificativa/observações.";
+      if (!form.confirmacao) return "Confirme as informações para prosseguir.";
+
+      if (form.anexos.length > MAX_FILES) return `Limite de anexos: ${MAX_FILES} arquivo(s).`;
+      const tooBig = form.anexos.find(f => f.size > MAX_FILE_SIZE_BYTES);
+      if (tooBig) return `Arquivo muito grande: ${tooBig.name} (máx. ${formatBytes(MAX_FILE_SIZE_BYTES)}).`;
+
+      return null;
+    }
+
+    // =========================
+    // Envio para o Flow
+    // =========================
+    async function montarPayload(form) {
+      const anexos = [];
+      for (const file of form.anexos) {
+        const contentBytes = await readFileAsBase64(file);
+        anexos.push({
+          nome: file.name,
+          tipo: file.type || "application/octet-stream",
+          tamanho: file.size,
+          contentBytes
+        });
+      }
+
+      return {
+        // Ajuste as chaves abaixo para bater com os campos do gatilho do Flow
+        solicitante_nome: form.nome,
+        solicitante_email: form.email,
+        solicitante_matricula: form.matricula,
+        solicitante_area: form.area,
+        gestor_nome: form.gestorNome,
+        gestor_email: form.gestorEmail,
+        tipo_solicitacao: form.tipoSolicitacao,
+        perfil_solicitado: form.perfil,
+        justificativa: form.justificativa,
+        anexos, // no Flow: Parse JSON para tratar como array
+        origem: "Portal_Cadastro_CS",
+        data_hora_iso: new Date().toISOString()
+      };
+    }
+
+    async function enviarParaFlow(payload) {
+      const url = getFlowUrl();
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    // =========================
+    // Eventos
+    // =========================
+    document.getElementById("btnLimpar").addEventListener("click", () => {
+      document.getElementById("formCadastro").reset();
+      anexosInput.value = "";
+      renderFileList([]);
+      clearStatus();
+    });
+
+    document.getElementById("btnCopiar").addEventListener("click", async () => {
+      try {
+        clearStatus();
+        const form = getFormData();
+        const error = validate({ ...form, confirmacao: true }); // permite copiar sem marcar checkbox
+        if (error) {
+          showErr("Preencha os campos obrigatórios para gerar o payload.\n\n" + error);
+          return;
+        }
+        showLoader("Gerando payload…");
+        const payload = await montarPayload({ ...form, confirmacao: true });
+        await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+        showOk("Payload copiado para a área de transferência.");
+      } catch (e) {
+        showErr("Não foi possível copiar o payload. Se estiver usando arquivo local, seu navegador pode bloquear a área de transferência.");
+      } finally {
+        hideLoader();
+      }
+    });
+
+    document.getElementById("btnConfig").addEventListener("click", () => {
+      const atual = getFlowUrl();
+      const nova = prompt("Cole a URL do Flow (deixe em branco para voltar ao padrão):", atual);
+      if (nova === null) return;
+      setFlowUrl(nova);
+      showOk("Configuração salva. URL atual:\n" + getFlowUrl());
+    });
+
+    document.getElementById("formCadastro").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      clearStatus();
+
+      const form = getFormData();
+      const error = validate(form);
+      if (error) {
+        showErr(error);
+        return;
+      }
+
+      showLoader("Enviando solicitação…");
+      try {
+        const payload = await montarPayload(form);
+        const res = await enviarParaFlow(payload);
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status} ${res.statusText}\n${text}`.trim());
+        }
+
+        let retorno = "";
+        try {
+          const json = await res.json();
+          retorno = JSON.stringify(json, null, 2);
+        } catch {
+          // alguns flows retornam vazio/202
+        }
+
+        const msg = retorno
+          ? "Solicitação enviada com sucesso.\n\nRetorno do Flow:\n" + retorno
+          : "Solicitação enviada com sucesso. Aguarde a aprovação.";
+        showOk(msg);
+        document.getElementById("formCadastro").reset();
+        anexosInput.value = "";
+        renderFileList([]);
+      } catch (e) {
+        showErr("Erro ao enviar para o Flow.\n\n" + (e && e.message ? e.message : String(e)));
+      } finally {
+        hideLoader();
+      }
+    });
+  </script>
+</body>
+</html>
